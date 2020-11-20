@@ -9,7 +9,7 @@ import axios from "../../utils/axios";
 
 import BlogCard from "../BlogCard";
 import Comments from "./Comments";
-import CommentForm from "./CommentForm";
+import NewCommentForm from "./NewCommentForm";
 
 import "./FullBlog.css";
 
@@ -33,6 +33,22 @@ const FullBlog = (props) => {
           ...blog,
           comments: [...blog.comments, result.data],
         };
+        setBlog(updatedBlog);
+      });
+  };
+
+  const handleCommmentEdit = (commentId, commentText) => {
+    axios
+      .put(`/blogs/${blogId}/comments/${commentId}`, {
+        comment: commentText,
+      })
+      .then((results) => {
+        console.log(results.data);
+        const updatedBlog = { ...blog };
+        const relCommInd = updatedBlog.comments.findIndex(
+          (comment) => comment._id === commentId
+        );
+        updatedBlog.comments[relCommInd] = results.data;
         setBlog(updatedBlog);
       });
   };
@@ -73,9 +89,10 @@ const FullBlog = (props) => {
         comments={blog.comments}
         user={props.user}
         deleteComment={handleCommentDelete}
+        editComment={handleCommmentEdit}
       />
       {props.user.username ? (
-        <CommentForm clicked={handleCommentSubmit} blogId={blogId} />
+        <NewCommentForm clicked={handleCommentSubmit} blogId={blogId} />
       ) : (
         <Typography
           variant="body1"

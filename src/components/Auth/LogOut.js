@@ -41,7 +41,7 @@ const LogOut = ({ removeUser }) => {
     axios.defaults.headers.common["Authorization"] = "";
     setTimeout(() => {
       history.push("/");
-    }, 5000);
+    }, 500);
   }, []);
 
   return (

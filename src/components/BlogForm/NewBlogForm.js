@@ -61,7 +61,7 @@ const NewBlogForm = (props) => {
         }
 
         if (results.data.content) {
-          history.push(`/blogs/${results.data._id}`);
+          history.push(`/control-panel`);
         }
       })
       .catch((err) => {
@@ -134,7 +134,7 @@ const NewBlogForm = (props) => {
             className={classes.button}
             onClick={handleClick}
           >
-            Submit blog
+            Save blog
           </Button>
         </div>
       </Container>

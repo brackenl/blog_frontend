@@ -8,6 +8,8 @@ import { Container, Button } from "@material-ui/core";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
 
 import { setUser, removeUser } from "../../redux/redux";
 
@@ -45,6 +47,7 @@ const EditBlogForm = (props) => {
   const [isErrors, setIsErrors] = useState(false);
   const [errors, setErrors] = useState([]);
   const [url, setUrl] = useState("");
+  const [published, setPublished] = useState(false);
 
   if (!props.location.state) {
     history.push("/");
@@ -54,9 +57,14 @@ const EditBlogForm = (props) => {
     if (props.location.state) {
       setTitleInput(props.location.state.title);
       setContentInput(props.location.state.content);
+      setPublished(props.location.state.published);
       setUrl(`/blogs/${props.location.state._id}`);
     }
   }, []);
+
+  const togglePublish = () => {
+    setPublished(!published);
+  };
 
   const handleClick = () => {
     axios({
@@ -65,6 +73,7 @@ const EditBlogForm = (props) => {
       data: {
         title: titleInput,
         content: contentInput,
+        published: published,
       },
     })
       .then((results) => {
@@ -74,7 +83,7 @@ const EditBlogForm = (props) => {
         }
 
         if (results.data.content) {
-          history.push(`/blogs/${results.data._id}`);
+          history.push("/control-panel");
         }
       })
       .catch((err) => {
@@ -141,6 +150,18 @@ const EditBlogForm = (props) => {
               </List>
             </div>
           ) : null}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={published}
+                onChange={togglePublish}
+                name="checkedB"
+                color="primary"
+              />
+            }
+            label="Published"
+            style={{ marginLeft: -4 }}
+          />
           <Button
             variant="outlined"
             color="primary"

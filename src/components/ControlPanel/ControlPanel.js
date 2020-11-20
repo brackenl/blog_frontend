@@ -3,19 +3,13 @@ import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { Container, Button } from "@material-ui/core";
+import { Container } from "@material-ui/core";
 import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-
-import { setUser, removeUser } from "../../redux/redux";
 
 import axios from "../../utils/axios";
+
+import CPBlogListItem from "./CPBlogListItem";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,15 +40,44 @@ const ControlPanel = (props) => {
 
   const [blogs, setBlogs] = useState([]);
 
+  if (!props.user.username) {
+    history.push("/");
+  }
+
   useEffect(() => {
     axios.get("/blogs").then((results) => setBlogs(results.data));
   }, []);
 
   const handleEditClick = (id) => {
     const relBlog = blogs.find((blog) => blog._id === id);
-    console.log(relBlog);
     history.push({ pathname: `/blogs/${id}/edit`, state: relBlog });
   };
+
+  const handlePublishClick = (id) => {
+    const relBlog = blogs.find((blog) => blog._id === id);
+    const updatedBlog = { ...relBlog, published: !relBlog.published };
+    axios.put(`/blogs/${id}`, updatedBlog).then((results) => {
+      const relIndex = blogs.findIndex((blog) => blog._id === results.data._id);
+      const updatedBlogs = [...blogs];
+      updatedBlogs[relIndex] = updatedBlog;
+      setBlogs(updatedBlogs);
+    });
+  };
+
+  const handleDeleteClick = (id) => {
+    axios.delete(`/blogs/${id}`).then((results) => {
+      const updatedBlogs = blogs.filter((blog) => blog._id !== id);
+      setBlogs(updatedBlogs);
+    });
+  };
+
+  const publishedBlogs = blogs.filter(
+    (blog) => blog.author.username === props.user.username && blog.published
+  );
+
+  const unpublishedBlogs = blogs.filter(
+    (blog) => blog.author.username === props.user.username && !blog.published
+  );
 
   return (
     <div className={classes.root}>
@@ -62,35 +85,49 @@ const ControlPanel = (props) => {
         maxWidth="sm"
         style={{ backgroundColor: "white", height: "100vh", marginTop: "2px" }}
       >
-        <Typography variant="h5" gutterBottom style={{ marginLeft: 8 }}>
+        <Typography
+          variant="h5"
+          gutterBottom
+          style={{ marginLeft: 8, paddingTop: 20 }}
+        >
           Published blogs
         </Typography>
         <div>
           <List>
-            {blogs
-              .filter(
-                (blog) =>
-                  blog.author.username === props.user.username && blog.published
-              )
-              .map((filteredBlog) => {
-                return (
-                  <ListItem key={filteredBlog._id}>
-                    <ListItemText primary={filteredBlog.title} />
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        edge="end"
-                        aria-label="edit"
-                        onClick={() => handleEditClick(filteredBlog._id)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton edge="end" aria-label="delete">
-                        <DeleteIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                );
-              })}
+            {publishedBlogs.map((filteredBlog) => {
+              return (
+                <CPBlogListItem
+                  filteredBlog={filteredBlog}
+                  handleEditClick={handleEditClick}
+                  handlePublishClick={handlePublishClick}
+                  handleDeleteClick={handleDeleteClick}
+                  key={filteredBlog._id}
+                />
+              );
+            })}
+          </List>
+        </div>
+        <Typography
+          variant="h5"
+          gutterBottom
+          style={{ marginLeft: 8, paddingTop: 20 }}
+        >
+          Unpublished blogs
+        </Typography>
+        <div>
+          <List>
+            {unpublishedBlogs.map((filteredBlog) => {
+              return (
+                <CPBlogListItem
+                  filteredBlog={filteredBlog}
+                  handleEditClick={handleEditClick}
+                  handlePublishClick={handlePublishClick}
+                  handleDeleteClick={handleDeleteClick}
+                  key={filteredBlog._id}
+                  unpublished={true}
+                />
+              );
+            })}
           </List>
         </div>
       </Container>

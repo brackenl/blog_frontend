@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
@@ -23,20 +23,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CommentForm = ({ clicked, blogId }) => {
+const EditCommentForm = ({ clicked, content }) => {
   const classes = useStyles();
   const [commentText, setCommentText] = useState("");
 
   const handleClick = () => {
     clicked(commentText);
-    setCommentText("");
   };
+
+  useEffect(() => {
+    setCommentText(content);
+  }, []);
 
   return (
     <Card className={classes.root} style={{ marginBottom: "5px" }}>
       <CardContent>
         <Typography variant="h5" gutterBottom>
-          Submit a comment
+          Edit comment
         </Typography>
         <TextField
           id="commentField"
@@ -60,11 +63,11 @@ const CommentForm = ({ clicked, blogId }) => {
           className={classes.button}
           onClick={handleClick}
         >
-          Submit comment
+          Edit comment
         </Button>
       </CardContent>
     </Card>
   );
 };
 
-export default CommentForm;
+export default EditCommentForm;
