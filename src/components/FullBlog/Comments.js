@@ -1,9 +1,7 @@
 import React from "react";
 
-import format from "date-fns/format";
-
 import { makeStyles } from "@material-ui/core/styles";
-import { Card, Button, CardContent, Typography } from "@material-ui/core";
+import { Card, CardContent, Typography } from "@material-ui/core";
 import CommentCard from "./CommentCard";
 
 const useStyles = makeStyles((theme) => ({

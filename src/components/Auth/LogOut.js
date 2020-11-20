@@ -42,7 +42,7 @@ const LogOut = ({ removeUser }) => {
     setTimeout(() => {
       history.push("/");
     }, 500);
-  }, []);
+  }, [removeUser, history]);
 
   return (
     <div className={classes.root}>
